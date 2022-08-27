@@ -3,7 +3,7 @@ const stopBtn = document.querySelector('[data-stop]');
 let timer = null;
 
 function getRandomHexColor() {
- return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 }
 
 startBtn.addEventListener('click', () => {

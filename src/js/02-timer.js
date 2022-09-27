@@ -8,9 +8,10 @@ const daysValue = document.querySelector('[data-days]');
 const hoursValue = document.querySelector('[data-hours]');
 const minutesValue = document.querySelector('[data-minutes]');
 const secondsValue = document.querySelector('[data-seconds]');
-let timer = null;
+let timerId = null;
+let selectedDate = null;
 
-startBtn.disabled =  true;
+startBtn.disabled = true;
 
 function convertMs(ms) {
   const second = 1000;
@@ -36,43 +37,38 @@ const options = {
   onClose(selectedDates) {
     if (selectedDates[0] < new Date()) {
       Notify.failure('Please choose a date in the future');
+      startBtn.disabled = true;
       return;
     }
-
+    selectedDate = selectedDates[0];
     startBtn.disabled = false;
-
-    const startTimer = () => {
-      localStorage.setItem('selectedData', selectedDates[0]);
-      const selectData = new Date(localStorage.getItem('selectedData'));
-
-      if (!selectData) return;
-
-      const { days, hours, minutes, seconds } = convertMs(selectData - new Date());
-      daysValue.textContent = days;
-      hoursValue.textContent = addLeadingZero(hours);
-      minutesValue.textContent = addLeadingZero(minutes);
-      secondsValue.textContent = addLeadingZero(seconds);
-
-      if (
-        daysValue.textContent === '0' &&
-        hoursValue.textContent === '00' &&
-        minutesValue.textContent === '00' &&
-        secondsValue.textContent === '00'
-      ) {
-        clearInterval(timer);
-      }
-    };
-
-    const onClick = () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-      startTimer();
-      timer = setInterval(startTimer, 1000);
-    };
-
-    startBtn.addEventListener('click', onClick);
   },
 };
 
-flatpickr(input, { ...options });
+flatpickr(input, options);
+
+const renderTimer = () => {
+  if (!selectedDate) return;
+
+  let currentTime = selectedDate - new Date();
+  if (currentTime <= 0) {
+    currentTime = 0;
+    clearInterval(timerId);
+  }
+  const { days, hours, minutes, seconds } = convertMs(currentTime);
+  daysValue.textContent = addLeadingZero(days);
+  hoursValue.textContent = addLeadingZero(hours);
+  minutesValue.textContent = addLeadingZero(minutes);
+  secondsValue.textContent = addLeadingZero(seconds);
+};
+
+const onClick = () => {
+  if (timerId) {
+    clearInterval(timerId);
+  }
+  renderTimer();
+  timerId = setInterval(renderTimer, 1000);
+  startBtn.disabled = true;
+};
+
+startBtn.addEventListener('click', onClick);

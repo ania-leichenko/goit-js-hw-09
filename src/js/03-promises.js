@@ -21,7 +21,7 @@ function onsubmit(e) {
   e.preventDefault();
   const { amount, delay, step } = e.target;
 
-  for (let i = 0; i < amount.value; i++) {
+  for (let i = 1; i < amount.value; i++) {
     let promiseDelay = Number(delay.value) + Number(step.value) * i;
     createPromise(i, promiseDelay)
       .then(({ position, delay }) => {
